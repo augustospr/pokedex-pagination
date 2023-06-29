@@ -1,0 +1,27 @@
+body {
+  background-color: gainsboro;
+}
+
+.nomePokemon {
+  text-transform: capitalize;
+}
+
+.tipos {
+  text-transform: capitalize;
+}
+
+.paginacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.paginacao button {
+  margin: 0 10px;
+}
+
+.css-1ri6ub7-MuiPaper-root-MuiCard-root {
+  width: 100% !important;
+  max-width: 100% !important;
+  background-size: cover;
+}
