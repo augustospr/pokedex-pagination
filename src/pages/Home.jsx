@@ -10,6 +10,8 @@ export default function Home() {
 
   const [api, setApi] = useState([]);
 
+  const [apiFilter, setApiFilter] = useState(null);
+
   const [filtrado, setFiltrado] = useState("");
 
   const filtraPokemon = (nome) => {
@@ -23,6 +25,12 @@ export default function Home() {
   useEffect(() => {
     getApiData();
   }, [offset]);
+
+  useEffect(() => {
+    if (filtrado === "" && apiFilter != null ) {
+      setApiFilter(null);
+    }
+  }, [filtrado]);
 
   const getApiData = async () => {
     try {
@@ -40,19 +48,35 @@ export default function Home() {
     }
   }
 
+  const filterApiData = () => {
+    try {
+      fetch(`https://pokeapi.co/api/v2/pokemon/${filtrado}/`)
+        .then((res) => (res.json()))
+        .then((data) => setApiFilter(data));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <>
       <Container sx={{ paddingBottom: 5 }}>
         <Grid container spacing={2}>
           <Cabecalho />
-          <PesquisaPokemon filtraPokemon={filtraPokemon} />
+          <PesquisaPokemon filtraPokemon={filtraPokemon} filterApiData={filterApiData} />
 
-          {api.filter(pokemon => pokemon.name.includes(filtrado)).map((item, index) => (
+          {apiFilter ? null : api.map((item, index) => (
             <Grid item key={index} xs={12} sm={4} md={2}>
               <CardPokemon nome={item.name} imagem={item.sprites.front_default} tipo={item.types} />
             </Grid>
-
           ))}
+
+          {apiFilter ? (
+            <Grid item key={apiFilter.id} xs={12} sm={4} md={2}>
+              <CardPokemon nome={apiFilter.name} imagem={apiFilter.sprites.front_default} tipo={apiFilter.types} />
+            </Grid>
+          ) : null}
+
           <Grid item xs={12} textAlign="center">
             <Paginacao addMore={() => setOffset(offset + limit)} />
           </Grid>
