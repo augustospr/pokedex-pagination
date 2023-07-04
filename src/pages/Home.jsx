@@ -18,7 +18,7 @@ export default function Home() {
   const totalPages = (totalPokemons / limit);
 
   const filtraPokemon = (nome) => {
-    setFiltrado(nome);
+    setFiltrado(nome.toLowerCase());
   }
 
   useEffect(() => {
