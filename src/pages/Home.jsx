@@ -9,28 +9,31 @@ import { useState } from "react";
 export default function Home() {
 
   const [api, setApi] = useState([]);
-
   const [apiFilter, setApiFilter] = useState(null);
-
   const [filtrado, setFiltrado] = useState("");
+  const [totalPokemons, setTotalPokemons] = useState([]);
+  const [pages, setPages] = useState(0 + 1);
+  const [offset, setOffset] = useState(0);
+  const limit = 24;
+  const totalPages = (totalPokemons / limit);
 
   const filtraPokemon = (nome) => {
     setFiltrado(nome);
   }
-
-  const limit = 24;
-
-  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     getApiData();
   }, [offset]);
 
   useEffect(() => {
-    if (filtrado === "" && apiFilter != null ) {
+    if (filtrado === "" && apiFilter != null) {
       setApiFilter(null);
     }
   }, [filtrado]);
+
+  useEffect(() => {
+    numberOfPokemons();
+  }, [])
 
   const getApiData = async () => {
     try {
@@ -41,7 +44,7 @@ export default function Home() {
       await Promise.all(endpoints.map((endpoint) => fetch(endpoint)))
         .then((res) => Promise.all(res.map(async r => r.json())))
         .then((res) => {
-          setApi([...api, ...res]);
+          setApi([...res]);
         });
     } catch (err) {
       console.log(err);
@@ -55,6 +58,30 @@ export default function Home() {
         .then((data) => setApiFilter(data));
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  const numberOfPokemons = () => {
+    try {
+      fetch(`https://pokeapi.co/api/v2/pokemon-species/`)
+        .then((res) => (res.json()))
+        .then((data) => setTotalPokemons(data.count));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const nextPage = () => {
+    if (pages <= totalPages) {
+      setPages(pages + 1);
+      setOffset(offset + limit);
+    }
+  }
+
+  const previousPage = () => {
+    if (pages > 1) {
+      setPages(pages - 1);
+      setOffset(offset - limit);
     }
   }
 
@@ -78,7 +105,7 @@ export default function Home() {
           ) : null}
 
           <Grid item xs={12} textAlign="center">
-            <Paginacao addMore={() => setOffset(offset + limit)} />
+            <Paginacao nextPage={nextPage} previousPage={previousPage} totalPokemons={totalPokemons} limit={limit} pages={pages} />
           </Grid>
         </Grid>
       </Container>
